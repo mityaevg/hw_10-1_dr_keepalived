@@ -48,7 +48,7 @@ HW-01_Обзор систем ИТ-мониторинга
 
 <kbd>![Скриншот](img/screenshot3.png)</kbd>
 
-<kbd>![Скриншот](img/<screenshot4.png)</kbd>
+<kbd>![Скриншот](img/screenshot4.png)</kbd>
 
 <kbd>![Скриншот](img/screenshot5.png)</kbd>
 
