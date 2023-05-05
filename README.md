@@ -48,7 +48,7 @@ pg_config --version
 #### Требования к результату
 * прикрепите в файл README.md скриншот вашего дашборда в Yandex Monitoring с мониторингом загрузки процессора виртуальной машины 
 
-<kbd>![Скриншот](img/screenshot1.png)</kbd>
+<kbd>![Версия PostgreSQL](img/postgresql_version.png)</kbd>
 
 <kbd>![Скриншот](img/screenshot2.png)</kbd>
 
