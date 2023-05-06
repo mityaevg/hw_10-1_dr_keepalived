@@ -94,6 +94,6 @@ systemctl status zabbix-agent.service
 
 <kbd>![Список разрешенных хостов Zabbix сервера](img/zabbix_agentd.conf.png)</kbd>
 
-<kbd>![Добавил хосты с Zabbix агентами](img/configuration-host-added-zabbix-agents.png)</kbd>
+<kbd>![Добавил хосты с Zabbix агентами](img/configuration-hosts-added-zabbix-agents.png)</kbd>
 
 <kbd>![Информация из раздела Monitoting -> Latest data](img/latest_data_section_info.png)</kbd>
