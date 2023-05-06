@@ -57,7 +57,7 @@ systemctl status apache2.service
 
 <kbd>![Статус службы Apache сервер](img/apache_service_status.png)</kbd>
 
-<kbd>![Авторизация в Zabbix веб-интерфейс](img/zabbix_web-interface-authorisation.png)</kbd>
+<kbd>![Авторизация в Zabbix веб-интерфейс](img/zabbix_web-interface_authorisation.png)</kbd>
 
 ---
 
