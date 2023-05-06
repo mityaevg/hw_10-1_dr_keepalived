@@ -44,8 +44,6 @@ systemctl status zabbix-server.service
 systemctl status apache2.service
 
 ```
-#### Требования к результату
-* прикрепите в файл README.md скриншот вашего дашборда в Yandex Monitoring с мониторингом загрузки процессора виртуальной машины 
 
 <kbd>![Версия PostgreSQL](img/postgresql_version.png)</kbd>
 
@@ -61,17 +59,41 @@ systemctl status apache2.service
 
 ---
 
-### Задание 2 со звёздочкой*
-*Это дополнительное задание. Его можно не выполнять. Это не повлияет на зачёт. Вы можете его выполнить, если хотите глубже разобраться в материале.*
+### Задание 2
 
-С помощью Yandex Monitoring сделайте 2 алерта на загрузку процессора: WARN и ALARM. Создайте уведомление по e-mail.
+Установите Zabbix Agent на два хоста.
 
-#### Требования к результату
-* прикрепите в файл README.md скриншот уведомления в Yandex Monitoring 
 
-## Критерии оценки
 
-1. Выполнено минимум обязательное задание
-2. Прикреплен (ы) скриншот(ы) 
-3. Задание оформлено в шаблоне с решением и опубликовано на GitHub
+#### Процесс выполнения
 
+2. Установка **Zabbix агента** на 2 ВМ: **192.168.1.130** (та же машина, на которой размещен Zabbix сервер) и **192.168.1.94**.
+3. Добавил адрес **Zabbix сервера** - **192.168.1.130** в список разрешенных хостов на ВМ - **192.168.1.94** в файле конфигурации
+Zabbix агента - **zabbix_agentd.conf**, расположенный в **/etc/zabbix/zabbix_agentd.conf**.
+4. Добавил **Zabbix агентов** в раздел **Configuration** -> **Hosts** Zabbix сервера.
+
+```
+wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-4+debian11_all.deb
+dpkg -i zabbix-release_6.0-4+debian11_all.deb
+
+apt update
+
+apt install zabbix-agent
+
+systemctl restart zabbix-agent
+systemctl enable zabbix-agent
+systemctl status zabbix-agent.service
+
+nano /etc/zabbix/zabbix_agentd.conf
+systemctl restart zabbix-agent.service
+systemctl status zabbix-agent.service
+
+```
+
+<kbd>![Статус службы Zabbix агент](img/zabbix_agent_service_status.png)</kbd>
+
+<kbd>![Список разрешенных хостов Zabbix сервера](img/zabbix_agentd.conf.png)</kbd>
+
+<kbd>![Добавил хосты с Zabbix агентами](img/configuration-host-added-zabbix-agents.png)</kbd>
+
+<kbd>![Информация из раздела Monitoting -> Latest data](img/latest_data_section_info.png)</kbd>
