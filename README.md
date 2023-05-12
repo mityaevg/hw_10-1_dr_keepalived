@@ -10,6 +10,22 @@ HW-03_Система мониторинга Zabbix. Часть 2
 4. Научиться создавать Python-скрип, добавляться в него UserParameter и прикреплять к шаблону.
 5. Научиться создавать Vagrant-скрипты для Zabbix Agent.
 
+### Задание 1
+
+Создайте свой шаблон, в котором будут элементы данных, мониторящие загрузку CPU и RAM хоста.
+
+#### Процесс выполнения
+
+2. Создал новый шаблон **Assignment 2**.
+3. Создал item **CPU Load** (system.cpu.util).
+4. Создал item **RAM Load** (vm.memory.size).
+
+<kbd>![Шаблон Assignment 2](img/template_assignment2.png)</kbd>
+
+<kbd>![Items Assignment 2](img/items_assignment2.png)</kbd>
+
+---
+
 ### Задание 4
 
 Создайте свой кастомный дашборд.
@@ -26,41 +42,4 @@ HW-03_Система мониторинга Zabbix. Часть 2
 
 ---
 
-### Задание 2
 
-Установите Zabbix Agent на два хоста.
-
-
-
-#### Процесс выполнения
-
-2. Установка **Zabbix агента** на 2 ВМ: **192.168.1.130** (та же машина, на которой размещен Zabbix сервер) и **192.168.1.94**.
-3. Добавил адрес **Zabbix сервера** - **192.168.1.130** в список разрешенных хостов на ВМ - **192.168.1.94** в файле конфигурации
-Zabbix агента - **zabbix_agentd.conf**, расположенный в **/etc/zabbix/zabbix_agentd.conf**.
-4. Добавил **Zabbix агентов** в раздел **Configuration** -> **Hosts** Zabbix сервера.
-
-```
-wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-4+debian11_all.deb
-dpkg -i zabbix-release_6.0-4+debian11_all.deb
-
-apt update
-
-apt install zabbix-agent
-
-systemctl restart zabbix-agent
-systemctl enable zabbix-agent
-systemctl status zabbix-agent.service
-
-nano /etc/zabbix/zabbix_agentd.conf
-systemctl restart zabbix-agent.service
-systemctl status zabbix-agent.service
-
-```
-
-<kbd>![Статус службы Zabbix агент](img/zabbix_agent_service_status.png)</kbd>
-
-<kbd>![Список разрешенных хостов Zabbix сервера](img/zabbix_agentd.conf.png)</kbd>
-
-<kbd>![Добавил хосты с Zabbix агентами](img/configuration-hosts-added-zabbix-agents.png)</kbd>
-
-<kbd>![Информация из раздела Monitoting -> Latest data](img/latest_data_section_info.png)</kbd>
