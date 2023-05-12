@@ -10,54 +10,19 @@ HW-03_Система мониторинга Zabbix. Часть 2
 4. Научиться создавать Python-скрип, добавляться в него UserParameter и прикреплять к шаблону.
 5. Научиться создавать Vagrant-скрипты для Zabbix Agent.
 
-### Задание 1
+### Задание 4
 
-Установите Zabbix Server с веб-интерфейсом.
+Создайте свой кастомный дашборд.
 
 #### Процесс выполнения
-1. Просмотрел записи лекций из урока.
-2. Установил **PostgreSQL** из системного репозитория **Debian 11**.
-3-4. Установка **Zabbix сервера** и **Zabbix веб-интерфейса** c помощью [конфигуратора команд] (https://www.zabbix.com/ru/download?zabbix=6.0&os_distribution=debian&os_version=11&components=server_frontend_agent&db=pgsql&ws=apache). Без установки Zabbix агента.
+2. Создал новый дэшборд **Assignment 4**.
+3. Разместил на дэшборде 4 графика: **CPU Utilisation**, **Available RAM**, **Load Average (15m)** и **Disk Space (in use)**.
 
-```
-sudo apt install postgresql
-sudo systemctl start postgresql
-sudo systemctl enable postgresql
-sudo systemctl status postgresql
-pg_config --version
+<kbd>![Дэшборд Assignment 4_1](img/dashboard_assignment4_1.png)</kbd>
 
-wget https://repo.zabbix.com/zabbix/6.0/debian/pool/main/z/zabbix-release/zabbix-release_6.0-4+debian11_all.deb
-dpkg -i zabbix-release_6.0-4+debian11_all.deb
-apt update
+<kbd>![Дэшборд Assignment 4_2](img/dashboard_assignment4_2.png)</kbd>
 
-apt install zabbix-server-pgsql zabbix-frontend-php php7.4-pgsql zabbix-apache-conf zabbix-sql-scripts
-
-sudo -u postgres createuser --pwprompt zabbix
-sudo -u postgres createdb -O zabbix zabbix
-
-zcat /usr/share/zabbix-sql-scripts/postgresql/server.sql.gz | sudo -u zabbix psql zabbix
-
-nano /etc/zabbix/zabbix_server.conf
-DBPassword=12345
-
-systemctl restart zabbix-server apache2
-systemctl enable zabbix-server apache2
-systemctl status zabbix-server.service
-systemctl status apache2.service
-
-```
-
-<kbd>![Версия PostgreSQL](img/postgresql_version.png)</kbd>
-
-<kbd>![Статус сервиса PostgreSQL](img/postgresql_service_status.png)</kbd>
-
-<kbd>![Установка DBUser пароля](img/dbuser_zabbix_password.png)</kbd>
-
-<kbd>![Статус службы Zabbix сервер](img/zabbix_server_service_status.png)</kbd>
-
-<kbd>![Статус службы Apache сервер](img/apache_service_status.png)</kbd>
-
-<kbd>![Авторизация в Zabbix веб-интерфейс](img/zabbix_web-interface_authorisation.png)</kbd>
+<kbd>![Дэшборд Assignment 4_3](img/dashboard_assignment4_3.png)</kbd>
 
 ---
 
