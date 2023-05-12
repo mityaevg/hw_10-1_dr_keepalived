@@ -51,7 +51,7 @@ HW-03_Система мониторинга Zabbix. Часть 2
 #### Процесс выполнения
 2. Дополнительно прикрепил шаблон **Assignment 1** к каждому хосту:
 
-<kbd>![Прикрепил шаблон Assignment 1 к хостам](img/template_assignment1_added.png)</kbd>
+<kbd>![Прикрепил шаблон Assignment 1 к хостам](img/template_assigment1_added.png)</kbd>
 
 ### Задание 4
 
