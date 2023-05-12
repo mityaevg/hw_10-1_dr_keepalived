@@ -17,8 +17,8 @@ HW-03_Система мониторинга Zabbix. Часть 2
 #### Процесс выполнения
 
 2. Создал новый шаблон **Assignment 1**.
-3. Создал item **CPU Load** (system.cpu.util).
-4. Создал item **RAM Load** (vm.memory.size).
+3. Создал item **CPU Load** (`system.cpu.util[all,system]`).
+4. Создал item **RAM Load** (`vm.memory.size[pused]`).
 
 <kbd>![Шаблон Assignment 1](img/template_assigment1.png)</kbd>
 
@@ -52,6 +52,12 @@ HW-03_Система мониторинга Zabbix. Часть 2
 2. Дополнительно прикрепил шаблон **Assignment 1** к каждому хосту:
 
 <kbd>![Прикрепил шаблон Assignment 1 к хостам](img/template_assigment1_added.png)</kbd>
+
+3. Проверил раздел **Monitoring** -> **Latest data** с учетом внесенных изменений:
+
+<kbd>![Latest data только для Assignment 1 шаблона](img/latest_data_assignment1_only.png)</kbd>
+
+
 
 ### Задание 4
 
