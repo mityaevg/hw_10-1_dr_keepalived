@@ -42,6 +42,16 @@ HW-03_Система мониторинга Zabbix. Часть 2
 
 <kbd>![Assignment 2 Latest data](img/latest_data_2.png)</kbd>
 
+---
+
+### Задание 3
+
+Привяжите созданный шаблон к двум хостам. Также привяжите к обоим хостам шаблон Linux by Zabbix Agent.
+
+#### Процесс выполнения
+2. Дополнительно прикрепил шаблон **Assignment 1** к каждому хосту:
+
+<kbd>![Прикрепил шаблон Assignment 1 к хостам](img/template_assignment1_added.png)</kbd>
 
 ### Задание 4
 
