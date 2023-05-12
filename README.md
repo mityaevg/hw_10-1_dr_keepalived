@@ -57,7 +57,7 @@ HW-03_Система мониторинга Zabbix. Часть 2
 
 <kbd>![Latest data только для Assignment 1 шаблона](img/latest_data_assignment1_only.png)</kbd>
 
-
+---
 
 ### Задание 4
 
