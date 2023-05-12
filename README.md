@@ -36,6 +36,13 @@ HW-03_Система мониторинга Zabbix. Часть 2
 
 <kbd>![Список хостов](img/hosts.png)</kbd>
 
+6. Проверил раздел **Monitoring** -> **Latest data**:
+
+<kbd>![Assignment 2 Latest data](img/latest_data_1.png)</kbd>
+
+<kbd>![Assignment 2 Latest data](img/latest_data_2.png)</kbd>
+
+
 ### Задание 4
 
 Создайте свой кастомный дашборд.
