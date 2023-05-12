@@ -16,13 +16,13 @@ HW-03_Система мониторинга Zabbix. Часть 2
 
 #### Процесс выполнения
 
-2. Создал новый шаблон **Assignment 2**.
+2. Создал новый шаблон **Assignment 1**.
 3. Создал item **CPU Load** (system.cpu.util).
 4. Создал item **RAM Load** (vm.memory.size).
 
-<kbd>![Шаблон Assignment 2](img/template_assigment2.png)</kbd>
+<kbd>![Шаблон Assignment 1](img/template_assigment2.png)</kbd>
 
-<kbd>![Items Assignment 2](img/items_assignment2.png)</kbd>
+<kbd>![Items Assignment 1](img/items_assignment2.png)</kbd>
 
 ---
 
