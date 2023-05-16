@@ -11,9 +11,12 @@ HW-9-04_Система мониторинга Prometheus. Часть 1
 
 2. Создадим пользователя **prometheus**:
 
-`su -
+```
+su -
+useradd --no-create-home --shell /bin/false prometheus
+```
 
-useradd --no-create-home --shell /bin/false prometheus`
+
 
 4. Создал item **CPU Load** (`system.cpu.util[all,system]`).
 5. Создал item **RAM Load** (`vm.memory.size[pused]`).
