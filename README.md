@@ -13,6 +13,8 @@ HW-9-04_Система мониторинга Prometheus. Часть 1
 
 ```
 su -
+```
+```
 useradd --no-create-home --shell /bin/false prometheus
 ```
 
