@@ -10,15 +10,52 @@ HW-9-04_Система мониторинга Prometheus. Часть 1
 #### Процесс выполнения
 
 2. Создадим пользователя **prometheus**:
-
 ```
 su -
 ```
 ```
 useradd --no-create-home --shell /bin/false prometheus
 ```
+3. Скачивание **Prometheus 2.44.0** из официального репозитория: 
+```
+wget https://github.com/prometheus/prometheus/releases/download/v2.44.0/prometheus-2.44.0.linux-amd64.tar.gz
+```
+Распаковываем файлы из архива **prometheus-2.44.0.linux-amd64.tar.tz** и переходим в созданную директорию:
+```
+tar xvfz prometheus-2.44.0.linux-amd64.tar.tz
+cd prometheus-2.44.0.linux-amd64.tar.tz/
+```
+Создадим директории, необходимые для работы **Prometheus**:
+```
+mkdir /etc/prometheus/
+mkdir /var/lib/prometheus
+```
+Скопируем утилиты **prometheus** и **promtool** в директорию **/usr/local/bin**:
+```
+cp ./prometheus promtool /usr/local/bin
+```
+Скопируем директорию **console_libraries** в **/etc/prometheus**:
+```
+cp -R ./console_libraries /etc/prometheus
+```
+Скопируем директорию **consoles** в **/etc/prometheus**:
+```
+cp -R ./consoles /etc/prometheus
+```
+Скопируем файл конфигурации **prometheus.yml** в **/etc/prometheus**:
+```
+cp ./prometheus.yml /etc/prometheus
+```
+Проверим содержимое директории **/etc/prometheus**:
 
+<kbd>![Содержимое директории /etc/prometheus](img/etc_prometheus_contents.png)</kbd>
 
+Все необходимые на данном этапе объекты: **console_libraries** (директория), **consoles** (директория)
+и **prometheus.yml** (конфиг-файл) находятся на месте.
+
+Передадим пользователю **prometheus** права ко всех необходимым объектам:
+```
+chown -R prometheus:prometheus /etc/prometheus
 
 4. Создал item **CPU Load** (`system.cpu.util[all,system]`).
 5. Создал item **RAM Load** (`vm.memory.size[pused]`).
