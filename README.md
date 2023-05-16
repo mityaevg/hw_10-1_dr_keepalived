@@ -1,24 +1,20 @@
-# hw-03_mon_zabbix2
-HW-03_Система мониторинга Zabbix. Часть 2
+# hw-9-04_mon_prometheus1
+HW-9-04_Система мониторинга Prometheus. Часть 1
 
-# Домашнее задание к занятию «Система мониторинга Zabbix. Часть 2»
-
-### Цели задания
-1. Научитьcя создавать свои шаблоны в Zabbix, добавлять в Zabbix хосты и связывать шаблон с хостами.
-2. Научиться составлять кастомный дашборд.
-3. Научиться создавать UserParameter на Bash.
-4. Научиться создавать Python-скрип, добавляться в него UserParameter и прикреплять к шаблону.
-5. Научиться создавать Vagrant-скрипты для Zabbix Agent.
+# Домашнее задание к занятию «Система мониторинга Prometheus. Часть 1»
 
 ### Задание 1
 
-Создайте свой шаблон, в котором будут элементы данных, мониторящие загрузку CPU и RAM хоста.
+Установите Prometheus.
 
 #### Процесс выполнения
 
-2. Создал новый шаблон **Assignment 1**.
-3. Создал item **CPU Load** (`system.cpu.util[all,system]`).
-4. Создал item **RAM Load** (`vm.memory.size[pused]`).
+2. Создадим пользователя **prometheus**:
+`su -
+ useradd --no-create-home --shell /bin/false prometheus`
+
+4. Создал item **CPU Load** (`system.cpu.util[all,system]`).
+5. Создал item **RAM Load** (`vm.memory.size[pused]`).
 
 <kbd>![Шаблон Assignment 1](img/template_assigment1.png)</kbd>
 
