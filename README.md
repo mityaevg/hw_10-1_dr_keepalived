@@ -55,14 +55,72 @@ cp ./prometheus.yml /etc/prometheus
 
 Передадим пользователю **prometheus** права ко всех необходимым объектам:
 ```
-chown -R prometheus:prometheus /etc/prometheus
+chown -R prometheus:prometheus /etc/prometheus 
+chown -R prometheus:prometheus /var/lib/prometheus
+```
+Передадим права на утилиты **prometheus** и **promtool** в директории **/usr/local/bin** пользователю
+**prometheus**:
+```
+chown prometheus:prometheus /usr/local/bin/prometheus
+chown prometheus:prometheus /usr/local/bin/promtool
+```
+Чтобы проверить, правильно ли мы разместили все компоненты **Prometheus**, нужно попробовать их запустить:
+```
+/usr/local/bin/prometheus \
+--config.file /etc/prometheus/prometheus.yml \
+--storage.tsdb.path /var/lib/prometheus/ \
+--web.console.templates=/etc/prometheus/consoles \
+--web.console.libraries=/etc/prometheus/console_libraries
+```
+<kbd>![Пробный запуск компонентов Prometheus](img/prometheus_initial_start.png)</kbd>
 
-4. Создал item **CPU Load** (`system.cpu.util[all,system]`).
-5. Создал item **RAM Load** (`vm.memory.size[pused]`).
+4. Для настройки систему на запуск **Prometheus** самостоятельно создадим сервис **prometheus.service**:
 
-<kbd>![Шаблон Assignment 1](img/template_assigment1.png)</kbd>
+```
+nano /etc/systemd/system/prometheus.service
+```
+```
+[Unit]
+Description=Prometheus Service Netology Lesson 9.4 - Митяев Григорий Владимирович
+After=network.target
+[Service]
+User=prometheus
+Group=prometheus
+Type=simple
+ExecStart=/usr/local/bin/prometheus \
+--config.file /etc/prometheus/prometheus.yml \
+--storage.tsdb.path /var/lib/prometheus/ \
+--web.console.templates=/etc/prometheus/consoles \
+--web.console.libraries=/etc/prometheus/console_libraries
+ExecReload=/bin/kill -HUP $MAINPID Restart=on-failure
+[Install]
+WantedBy=multi-user.target
+```
+5. Включим автозапуск сервиса **prometheus.service**:
+```
+systemctl enable prometheus.service
+```
+Запустим сервис **prometheus.service**:
+```
+systemctl start prometheus.service
+```
+Проверим статус работы сервиса:
+```
+systemctl status prometheus.service
+```
+<kbd>![Статус сервиса prometheus.service](img/prometheus_service_status.png)</kbd>
 
-<kbd>![Items Assignment 1](img/items_assignment1.png)</kbd>
+Попробуем сделать перезапуск сервиса **prometheus.service**:
+```
+systemctl restart prometheus.service
+```
+Оставновка сервиса **prometheus.service**:
+```
+systemctl stop prometheus.service
+```
+Веб-интерфейс **Prometheus** доступный по адресу `http://10.0.2.15:9090`:
+
+<kbd>![Веб-интерфейс Prometheus](img/prometheus_web_interface.png)</kbd>
 
 ---
 
