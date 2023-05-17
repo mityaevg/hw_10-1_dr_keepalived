@@ -126,13 +126,63 @@ systemctl stop prometheus.service
 
 ### Задание 2
 
-Добавьте в Zabbix два хоста и задайте им имена <фамилия и инициалы-1> и <фамилия и инициалы-2>. Например: ivanovii-1 и ivanovii-2.
+Установите Node Exporter.
 
 #### Процесс выполнения
 
-5. Прикрепил к хостам **mityaevgv-1** и **mityaevgv-2** шаблон **Linux by Zabbix agent**:
+2. Скачаем **Node Exporter 1.5.0** из официального репозитория:
 
-<kbd>![Список хостов](img/hosts.png)</kbd>
+```
+cd
+wget https://github.com/prometheus/node_exporter/releases/download/v1.5.0/node_exporter-1.5.0.linux-amd64.tar.gz
+```
+Распакуем архив **node_exporter-1.5.0.linux-amd64.tar.gz**:
+```
+tar xvfz node_exporter-1.5.0.linux-amd64.tar.gz
+```
+Переходим в созданную директорию:
+```
+cd node_exporter-1.5.0.linux-amd64.tar.gz
+```
+Создадим директорию **/etc/prometheus/node-exporter** и скопируем туда файл **node_exporter**:
+```
+mkdir /etc/prometheus/node-exporter
+cp ./node_exporter /etc/prometheus/node-exporter/
+```
+Передадим права файл **node_exporter** нашему пользователю **prometheus**:
+```
+chown prometheus:prometheus /etc/prometheus/node-exporter/node_exporter
+```
+Проверим работоспособность **node_exporter**:
+
+<kbd>![Запуск node_exporter без создания сервиса](img/node_exporter_manual_start.png)</kbd>
+
+3. Создадим сервис **node-exporter.service** для автоматического запуска утилиты:
+```
+nano /etc/systemd/system/node-exporter.service
+```
+```
+[Unit]
+Description=Node Exporter Lesson 9.4
+After=network.target
+[Service]
+User=prometheus
+Group=prometheus
+Type=simple
+ExecStart=/etc/prometheus/node_exporter/node_exporter
+[Install]
+WantedBy=multi-user.target
+```
+Включим автозапуск сервиса:
+```
+systemctl enable node-exporter.service
+```
+Запустим новый сервис и проверим его статус:
+```
+systemctl start node-exporter.service
+systemctl status node-exporter.service
+```
+<kbd>![Статус работы сервиса node_exporter](img/node_exporter_service_status.png)</kbd>
 
 6. Проверил раздел **Monitoring** -> **Latest data**:
 
