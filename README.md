@@ -204,7 +204,7 @@ static_configs:
   -targets ["localhost:9090", "localhost:9100"]
 ```
 <kbd>![Добавление нашего end-point в prometheus.yml](img/scrape_configs_updated.png)</kbd>
-```
+
 Перезапустим сервис **prometheus.service**:
 ```
 systemctl restart prometheus.service
