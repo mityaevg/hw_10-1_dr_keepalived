@@ -217,8 +217,8 @@ systemctl status prometheus.service
 
 Скриншот раздела Prometheus **Status** -> **Configuration**:
 
-<kbd>![Status -> Configuration](img/prometheus_status_configuration.png</kbd>
+<kbd>![Status -> Configuration](img/prometheus_status_configuration.png)</kbd>
 
 Скриншот раздела Prometheus **Status** -> **Targets**:
 
-<kbd>![Status -> Targets](img/prometheus_status_targets.png</kbd>
+<kbd>![Status -> Targets](img/prometheus_status_targets.png)</kbd>
