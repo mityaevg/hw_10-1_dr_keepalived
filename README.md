@@ -184,43 +184,41 @@ systemctl status node-exporter.service
 ```
 <kbd>![Статус работы сервиса node_exporter](img/node_exporter_service_status.png)</kbd>
 
-6. Проверил раздел **Monitoring** -> **Latest data**:
-
-<kbd>![Assignment 2 Latest data](img/latest_data_1.png)</kbd>
-
-<kbd>![Assignment 2 Latest data](img/latest_data_2.png)</kbd>
-
 ---
 
 ### Задание 3
 
-Привяжите созданный шаблон к двум хостам. Также привяжите к обоим хостам шаблон Linux by Zabbix Agent.
+Подключите Node Exporter к серверу Prometheus.
 
 #### Процесс выполнения
-2. Дополнительно прикрепил шаблон **Assignment 1** к каждому хосту:
+2. Добавление нашего end-point, чтобы **Prometheus** начал опрашивать с него данные:
+```
+cd
+nano /etc/prometheus/prometheus.yml
+```
+Найдем раздел **scrape_configs** и добавим в него информацию о порте, на котором работает **node_exporter**
+- **localhost:9100**:
 
-<kbd>![Прикрепил шаблон Assignment 1 к хостам](img/template_assigment1_added.png)</kbd>
+```
+static_configs:
+  -targets ["localhost:9090", "localhost:9100"]
+```
+<kbd>![Добавление нашего end-point в prometheus.yml](img/scrape_configs_updated.png)</kbd>
+```
+Перезапустим сервис **prometheus.service**:
+```
+systemctl restart prometheus.service
+```
+Проверим статус работы сервиса:
+```
+systemctl status prometheus.service
+```
+<kbd>![Повторная проверка статуса prometheus.service](img/prometheus_service_status_1.png)</kbd>
 
-3. Проверил раздел **Monitoring** -> **Latest data** с учетом внесенных изменений:
+Скриншот раздела Prometheus **Status** -> **Configuration**:
 
-<kbd>![Latest data только для Assignment 1 шаблона](img/latest_data_assignment1_only.png)</kbd>
+<kbd>![Status -> Configuration](img/prometheus_status_configuration.png</kbd>
 
----
+Скриншот раздела Prometheus **Status** -> **Targets**:
 
-### Задание 4
-
-Создайте свой кастомный дашборд.
-
-#### Процесс выполнения
-2. Создал новый дэшборд **Assignment 4**.
-3. Разместил на дэшборде 4 графика: **CPU Utilisation**, **Available RAM**, **Load Average (15m)** и **Disk Space (in use)**.
-
-<kbd>![Дэшборд Assignment 4_1](img/dashboard_assignment4_1.png)</kbd>
-
-<kbd>![Дэшборд Assignment 4_2](img/dashboard_assignment4_2.png)</kbd>
-
-<kbd>![Дэшборд Assignment 4_3](img/dashboard_assignment4_3.png)</kbd>
-
----
-
-
+<kbd>![Status -> Targets](img/prometheus_status_targets.png</kbd>
