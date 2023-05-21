@@ -62,63 +62,92 @@ systemctl status node_exporter.service
 
 ### Задание 2
 
-Установите Node Exporter.
+Установите Alertmanager и интегрируйте его с Prometheus.
 
 #### Процесс выполнения
 
-2. Скачаем **Node Exporter 1.5.0** из официального репозитория:
-
+Скачаем последнюю версию **Alertmanager 0.25.0** из GitHub:
 ```
-cd
-wget https://github.com/prometheus/node_exporter/releases/download/v1.5.0/node_exporter-1.5.0.linux-amd64.tar.gz
+wget https://github.com/prometheus/alertmanager/releases/alertmanager-0.25.0.linux-and64.tar.tz
 ```
-Распакуем архив **node_exporter-1.5.0.linux-amd64.tar.gz**:
+Распакуем скачанный архив:
 ```
-tar xvfz node_exporter-1.5.0.linux-amd64.tar.gz
+tar xvfz alertmanager-0.25.0.linux-and64.tar.tz
 ```
-Переходим в созданную директорию:
+Скопируем содержимое получившейся директории в определенные расположения на нашем хосте и предоставим
+необходимые права доступа пользователю **prometheus**:
 ```
-cd node_exporter-1.5.0.linux-amd64.tar.gz
+cd alertmanager-0.25.0.linux-and64.tar.tz
+cp ./alertmanager /usr/local/bin/alertmanager
+chown prometheus:prometheus /usr/local/bin/alertmanager
+cp ./amtool /usr/local/bin/amtool
+chown prometheus:prometheus /usr/local/bin/amtool
+cp ./alertmanager.yml /etc/prometheus/alertmanager.yml
+chown prometheus:prometheus /etc/prometheus/alertmanager.yml
 ```
-Создадим директорию **/etc/prometheus/node-exporter** и скопируем туда файл **node_exporter**:
+Создадим сервис **prometheus-alertmanager.service**:
 ```
-mkdir /etc/prometheus/node-exporter
-cp ./node_exporter /etc/prometheus/node-exporter/
-```
-Передадим права файл **node_exporter** нашему пользователю **prometheus**:
-```
-chown prometheus:prometheus /etc/prometheus/node-exporter/node_exporter
-```
-Проверим работоспособность **node_exporter**:
-
-<kbd>![Запуск node_exporter без создания сервиса](img/node_exporter_manual_start.png)</kbd>
-
-3. Создадим сервис **node-exporter.service** для автоматического запуска утилиты:
-```
-nano /etc/systemd/system/node-exporter.service
+nano /etc/systemd/system/prometheus-alertmanager.service
 ```
 ```
 [Unit]
-Description=Node Exporter Lesson 9.4
+Description=Alertmanager Service
 After=network.target
 [Service]
+EnvironmentFile=-/etc/default/alertmanager
 User=prometheus
 Group=prometheus
 Type=simple
-ExecStart=/etc/prometheus/node_exporter/node_exporter
+ExecStart=/usr/local/bin/alertmanager \
+--config.file=/etc/prometheus/alertmanager.yml \
+--storage.path=/var/lib/prometheus/alertmanager $ARGS
+ExecReload=/bin/kill -HUP $MAINPID
+Restart=on-failure
 [Install]
 WantedBy=multi-user.target
 ```
-Включим автозапуск сервиса:
+Запустим сервис **prometheus-alertmanager.service**:
 ```
-systemctl enable node-exporter.service
+systemctl enable prometheus-alertmanager.service
+systemctl start prometheus-alertmanager.service
+systemctl status prometheus-alertmanager.service
 ```
-Запустим новый сервис и проверим его статус:
+Проверка статуса работы сервиса **prometheus-alertmanager.service**:
+
+<kbd>![Статус prometheus-alertmanager.service](img/prometheus-alertmanager.service_status.png)</kbd>
+
+Настройка **Prometheus** на работу c **Alertmanager**:
 ```
-systemctl start node-exporter.service
-systemctl status node-exporter.service
+nano /etc/prometheus/prometheus.yml
 ```
-<kbd>![Статус работы сервиса node_exporter](img/node_exporter_service_status.png)</kbd>
+Находим раздел **#Alertmanager configuration**, раскомментируем строку ```# - alertmanager:9093``` и
+заменим на ```- localhost: 9093```:
+
+```
+# Alertmanager configuration
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+            - localhost:9093
+```
+<kbd>![Alert manager configuration в prometheus.yml](img/prometheus.yml_alertmanager_config.png)</kbd>
+
+Перезапустим **prometheus.service** и проверим статус работы сервиса:
+```
+systemctl restart prometheus.service
+systemctl status prometheus.service
+```
+<kbd>![Статус работы prometheus.service](img/prometheus_service_status.png)</kbd>
+
+Скриншот из веб-интерфейса **Prometheus**, показывающий состояние правила оповещения **InstanceDown**, 
+- **FIRING**:
+
+<kbd>![Prometheus Webinterface Rule Firing](img/prometheus_webinterface_alerts_instancedown_firing.png)</kbd>
+
+Скриншот из веб-интерфейса **Alertmanager**:
+
+<kbd>![Alertmanager Webinterface InstanceDown правило](img/alertmananer_webinterface_instancedown.png)</kbd>
 
 ---
 
