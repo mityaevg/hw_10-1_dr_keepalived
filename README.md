@@ -5,122 +5,58 @@ HW-9-05_Система мониторинга Prometheus. Часть 2
 
 ### Задание 1
 
-Установите Prometheus.
+Создайте файл с правилом оповещения, как в лекции, и добавьте его в конфиг Prometheus.
 
 #### Процесс выполнения
 
-2. Создадим пользователя **prometheus**:
+Создадим конфиг-файл **netology-test.yml** с правилом оповещения:
 ```
-su -
+nano /etc/prometheus/netology-test.yml
 ```
 ```
-useradd --no-create-home --shell /bin/false prometheus
-```
-3. Скачивание **Prometheus 2.44.0** из официального репозитория: 
-```
-wget https://github.com/prometheus/prometheus/releases/download/v2.44.0/prometheus-2.44.0.linux-amd64.tar.gz
-```
-Распаковываем файлы из архива **prometheus-2.44.0.linux-amd64.tar.tz** и переходим в созданную директорию:
-```
-tar xvfz prometheus-2.44.0.linux-amd64.tar.tz
-cd prometheus-2.44.0.linux-amd64.tar.tz/
-```
-Создадим директории, необходимые для работы **Prometheus**:
-```
-mkdir /etc/prometheus/
-mkdir /var/lib/prometheus
-```
-Скопируем утилиты **prometheus** и **promtool** в директорию **/usr/local/bin**:
-```
-cp ./prometheus promtool /usr/local/bin
-```
-Скопируем директорию **console_libraries** в **/etc/prometheus**:
-```
-cp -R ./console_libraries /etc/prometheus
-```
-Скопируем директорию **consoles** в **/etc/prometheus**:
-```
-cp -R ./consoles /etc/prometheus
-```
-Скопируем файл конфигурации **prometheus.yml** в **/etc/prometheus**:
-```
-cp ./prometheus.yml /etc/prometheus
-```
-Проверим содержимое директории **/etc/prometheus**:
+groups: # Список групп
 
-<kbd>![Содержимое директории /etc/prometheus](img/etc_prometheus_contents.png)</kbd>
+- name: netology-test # Имя группы
+  rules: # Список правил текущей группы
+  - alert: InstanceDown # Название текущего правила
+    expr: up == 0 # Логическое выражение
+    for: 1m # Сколько ждать отбоя сработки перед отправкой оповещения
+    labels:
+      severity: critical # Критичность события
+    annotations: # Описание
+      description: '{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute.' # Полное описание оповещения
+      summary: Instance {{ $labels.instance }} down # Краткое описание оповещения
+```
+Присвоим пользователю **prometheus** права доступа с созданному конфиг-файлу **netology-test.yml**:
+```
+chown prometheus:prometheus /etc/prometheus/netology-test.yml
+```
+Подключим правило **InstanceDown** к **Prometheus**:
+```
+cd /etc/prometheus
+nano ./prometheus.yml
+```
+В конфиг-файле **prometheus.yml** найдем раздел **rule_files:** и пропишем там конфиг-файл **netology-test.yml**
+своего правила:
+```
+rule_files:
+  - "netology-test.yml"
+```
+<kbd>![Раздел rule_files в prometheus.yml](img/prometheus_config_rule_files.png)</kbd>
 
-Все необходимые на данном этапе объекты: **console_libraries** (директория), **consoles** (директория)
-и **prometheus.yml** (конфиг-файл) находятся на месте.
+Остановим сервис **node_exporter.service**:
+```
+systemctl stop node_exporter.service
+systemctl status node_exporter.service
+```
+Работа сервиса остановлена:
 
-Передадим пользователю **prometheus** права ко всех необходимым объектам:
-```
-chown -R prometheus:prometheus /etc/prometheus 
-chown -R prometheus:prometheus /var/lib/prometheus
-```
-Передадим права на утилиты **prometheus** и **promtool** в директории **/usr/local/bin** пользователю
-**prometheus**:
-```
-chown prometheus:prometheus /usr/local/bin/prometheus
-chown prometheus:prometheus /usr/local/bin/promtool
-```
-Чтобы проверить, правильно ли мы разместили все компоненты **Prometheus**, нужно попробовать их запустить:
-```
-/usr/local/bin/prometheus \
---config.file /etc/prometheus/prometheus.yml \
---storage.tsdb.path /var/lib/prometheus/ \
---web.console.templates=/etc/prometheus/consoles \
---web.console.libraries=/etc/prometheus/console_libraries
-```
-<kbd>![Пробный запуск компонентов Prometheus](img/prometheus_initial_start.png)</kbd>
+<kbd>![Сервис node_exporter остановлен](img/node_exporter_status_stopped.png)</kbd>
 
-4. Для настройки систему на запуск **Prometheus** самостоятельно создадим сервис **prometheus.service**:
+Скриншот раздела оповещений **Alerts** в **Prometheus**:
 
-```
-nano /etc/systemd/system/prometheus.service
-```
-```
-[Unit]
-Description=Prometheus Service Netology Lesson 9.4 - Митяев Григорий Владимирович
-After=network.target
-[Service]
-User=prometheus
-Group=prometheus
-Type=simple
-ExecStart=/usr/local/bin/prometheus \
---config.file /etc/prometheus/prometheus.yml \
---storage.tsdb.path /var/lib/prometheus/ \
---web.console.templates=/etc/prometheus/consoles \
---web.console.libraries=/etc/prometheus/console_libraries
-ExecReload=/bin/kill -HUP $MAINPID Restart=on-failure
-[Install]
-WantedBy=multi-user.target
-```
-5. Включим автозапуск сервиса **prometheus.service**:
-```
-systemctl enable prometheus.service
-```
-Запустим сервис **prometheus.service**:
-```
-systemctl start prometheus.service
-```
-Проверим статус работы сервиса:
-```
-systemctl status prometheus.service
-```
-<kbd>![Статус сервиса prometheus.service](img/prometheus_service_status.png)</kbd>
+<kbd>![Prometheus Alerts Pending Status](img/prometheus_alerts_pending.png)</kbd>
 
-Попробуем сделать перезапуск сервиса **prometheus.service**:
-```
-systemctl restart prometheus.service
-```
-Оставновка сервиса **prometheus.service**:
-```
-systemctl stop prometheus.service
-```
-Веб-интерфейс **Prometheus** доступный по адресу `http://10.0.2.15:9090`:
-
-<kbd>![Веб-интерфейс Prometheus](img/prometheus_web_interface.png)</kbd>
 
 ---
 
