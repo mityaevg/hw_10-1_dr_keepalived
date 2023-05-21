@@ -153,37 +153,7 @@ systemctl status prometheus.service
 
 ### Задание 3
 
-Подключите Node Exporter к серверу Prometheus.
+Активируйте экспортёр метрик в Docker и подключите его к Prometheus.
 
 #### Процесс выполнения
-2. Добавление нашего end-point, чтобы **Prometheus** начал опрашивать с него данные:
-```
-cd
-nano /etc/prometheus/prometheus.yml
-```
-Найдем раздел **scrape_configs** и добавим в него информацию о порте, на котором работает **node_exporter**
-- **localhost:9100**:
 
-```
-static_configs:
-  -targets ["localhost:9090", "localhost:9100"]
-```
-<kbd>![Добавление нашего end-point в prometheus.yml](img/scrape_configs_updated.png)</kbd>
-
-Перезапустим сервис **prometheus.service**:
-```
-systemctl restart prometheus.service
-```
-Проверим статус работы сервиса:
-```
-systemctl status prometheus.service
-```
-<kbd>![Повторная проверка статуса prometheus.service](img/prometheus_service_status_1.png)</kbd>
-
-Скриншот раздела Prometheus **Status** -> **Configuration**:
-
-<kbd>![Status -> Configuration](img/prometheus_status_configuration.png)</kbd>
-
-Скриншот раздела Prometheus **Status** -> **Targets**:
-
-<kbd>![Status -> Targets](img/prometheus_status_targets.png)</kbd>
