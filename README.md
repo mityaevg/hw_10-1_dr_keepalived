@@ -157,3 +157,78 @@ systemctl status prometheus.service
 
 #### Процесс выполнения
 
+1. Установка **docker engine** согласно инструкции приведенной на официальном сайте **Docker**:
+```
+sudo apt update
+sudo apt install ca-certificates curl gnupg
+
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+
+echo \
+"deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
+"$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
+sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
+sudo apt update
+
+sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+
+docker -v
+
+sudo docker run hello-world
+```
+<kbd>![Вывод на экран версии докера](img/docker_version.png)</kbd>
+
+<kbd>![Hello world container](img/docker_hello-world.png)</kbd>
+
+Включим автозапуск **docker.service**:
+```
+systemctl enable docker.service
+```
+Запустим **docker.service** и проверим его статус:
+```
+systemctl start docker.service
+systemctl status docker.service
+```
+2. Для того, чтобы активировать экспортер метрик в **Docker** (заранее заложенный туда функционал
+мониторига с помощью **Prometheus**), необходимо создать override-файл **daemon.json** для изменения
+стандартных параметров, с помощью которых запускается **Docker**:
+```
+nano /etc/docker/daemon.json
+```
+```
+{
+ "metrics-addr": "0.0.0.0:9323",
+ "experimental": true
+}
+```
+3. Перезапустим **docker.service** и проверим его статус:
+```
+systemctl restart docker.service
+systemctl status docker.service
+```
+4. Подключаемся к эндпоинту **http://10.0.2.15:9323/metrics** и видим список различных метрик,
+которые выводим сам о себе **Docker**:
+
+<kbd>![Метрики Докера](img/docker_endpoint_metrics.png)</kbd>
+
+5. Добавим эндпоинт в конфиг **Prometheus**:
+```
+nano /etc/prometheus/prometheus.yml
+```
+В разделе **static_configs:** добавим новый **target** - **"10.0.2.15:9323"**:
+
+<kbd>![Добавление таргета в конфиг Prometheus](img/adding_target_prometheus_config.png)</kbd>
+
+Перезапустим **prometheus.service**:
+```
+systemctl restart prometheus.service
+```
+6. Проверим статус добавленного endpoint в веб-интерфейсе **Prometheus** - **http://10.0.2.15:9090/targets**:
+
+<kbd>![Status -> Targets](img/prometheus_status_targets.png)</kbd>
+
+
+
