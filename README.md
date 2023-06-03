@@ -1,13 +1,16 @@
-# hw-9-05_mon_prometheus2
-HW-9-05_Система мониторинга Prometheus. Часть 2
+# hw_10-1_dr_keepalived
+HW_10-1_Disaster Recovery и Keepalived
 
-# Домашнее задание к занятию «Система мониторинга Prometheus. Часть 2»
+# Домашнее задание к занятию 1 «Disaster Recovery и Keepalived»
 
 ### Задание 1
 
-Создайте файл с правилом оповещения, как в лекции, и добавьте его в конфиг Prometheus.
+Схема сети из лекции:
 
-#### Процесс выполнения
+<kbd>![hsrp_advanced.pkt](img/hsrp_advanced.pkt.png)</kbd>
+
+
+
 
 Создадим конфиг-файл **netology-test.yml** с правилом оповещения:
 ```
