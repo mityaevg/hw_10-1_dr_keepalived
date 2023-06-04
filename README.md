@@ -53,8 +53,8 @@ root@keepalived-vm2:~# ip a
 ```
 Установим сервис **Keepalived** на каждой виртуальной машине:
 ```
-root@keepalived-vm1:~# apt install keepalived -y
-root@keepalived-vm2:~# apt install keepalived -y
+root@keepalived-vm1:~# apt install keepalived
+root@keepalived-vm2:~# apt install keepalived
 ```
 Создадим конфиг-файл **/etc/keepalived/keepalived.conf** на **keepalived-vm1**:
 ```
@@ -133,3 +133,27 @@ root@keepalived-vm1:~# systemctl stop keepalived.service
 **keepalived-vm2** был назначен floating IP - **192.168.1.15**, т.е. машина из режима BACKUP
 перешла в режим MASTER.
 
+Установим сервер **nginx** на виртуальные машины **keepalived-vm1** и **keepalived-vm2**:
+```
+apt install nginx
+```
+Изменим страницу **Nginx** по умолчанию, чтобы было понятно, к какому именно из серверов мы
+получаем доступ:
+```
+nano /var/www/html/index.nginx-debian.html
+```
+В строку приветствия добавим IP-адреса наших виртуальных машин:
+```
+<h1>Welcome to 192.168.1.127!</h1>
+<h1>Welcome to 192.168.1.110!</h1>
+```
+
+Bash-скрипт для проверки состояния сетевого порта **80**, на котором работает **Nginx-сервер**, и 
+доступности **index.html** в расположении **/var/www/html/index.nginx-debian.html**:
+```
+if [[ $(netstat -tulpn | grep LISTEN | grep :80) ]] && [[ -f /var/www/html/index.nginx-debian.html ]]; then
+exit 0
+else
+exit 1
+fi
+```
