@@ -9,57 +9,34 @@ HW_10-1_Disaster Recovery и Keepalived
 
 <kbd>![hsrp_advanced.pkt](img/hsrp_advanced.pkt.png)</kbd>
 
+Настройка отслеживания состояния интерфейсов **GigabitEthernet0/0** для маршрутизаторов 
+**Router1(0)** и **Router2(1)** для группы **Grp 1**:
 
+```
+Router0>en
+Router0#configure terminal
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router0(config)#interface gigabitEthernet0/0
+Router0(config-if)#standby 1 track gigabitEthernet0/0
+```
+<kbd>![Настройка отслеживания Gig0/0 для Grp 0](img/tracking_router1.png)</kbd>
 
+```
+Router1>en
+Router1#conf t
+Enter configuration commands, one per line.  End with CNTL/Z.
+Router1(config)#int gi0/0
+Router1(config-if)#standby 1 track gi0/0
+```
+<kbd>![Настройка отслеживания Gig0/0 для Grp 0](img/tracking_router2.png)</kbd>
 
-Создадим конфиг-файл **netology-test.yml** с правилом оповещения:
-```
-nano /etc/prometheus/netology-test.yml
-```
-```
-groups: # Список групп
+Для проверки работы функции отслеживания состояния интерфейсов разорвем канал связи между
+**Switch0** и **Router1**:
 
-- name: netology-test # Имя группы
-  rules: # Список правил текущей группы
-  - alert: InstanceDown # Название текущего правила
-    expr: up == 0 # Логическое выражение
-    for: 1m # Сколько ждать отбоя сработки перед отправкой оповещения
-    labels:
-      severity: critical # Критичность события
-    annotations: # Описание
-      description: '{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute.' # Полное описание оповещения
-      summary: Instance {{ $labels.instance }} down # Краткое описание оповещения
-```
-Присвоим пользователю **prometheus** права доступа с созданному конфиг-файлу **netology-test.yml**:
-```
-chown prometheus:prometheus /etc/prometheus/netology-test.yml
-```
-Подключим правило **InstanceDown** к **Prometheus**:
-```
-cd /etc/prometheus
-nano ./prometheus.yml
-```
-В конфиг-файле **prometheus.yml** найдем раздел **rule_files:** и пропишем там конфиг-файл **netology-test.yml**
-своего правила:
-```
-rule_files:
-  - "netology-test.yml"
-```
-<kbd>![Раздел rule_files в prometheus.yml](img/prometheus_config_rule_files.png)</kbd>
+<kbd>![Схема с разорванным каналом между Switch0 и Router1](img/link_terminated.png)</kbd>
 
-Остановим сервис **node_exporter.service**:
-```
-systemctl stop node_exporter.service
-systemctl status node_exporter.service
-```
-Работа сервиса остановлена:
-
-<kbd>![Сервис node_exporter остановлен](img/node_exporter_status_stopped.png)</kbd>
-
-Скриншот раздела оповещений **Alerts** в **Prometheus**:
-
-<kbd>![Prometheus Alerts Pending Status](img/prometheus_alerts_pending.png)</kbd>
-
+При запуске **ping** между **PC0** и **Server0** в режиме **Simulation** трафик возвращается 
+по нижней магистрали. Файл **hsrp_advanced.pkt** приложен к ДЗ.
 
 ---
 
