@@ -42,173 +42,94 @@ Router1(config-if)#standby 1 track gi0/0
 
 ### Задание 2
 
-Установите Alertmanager и интегрируйте его с Prometheus.
+Запустим 2 виртуальные машины - **keepalived-vm1** и **keepalived-vm2** для выполнения задания.
 
-#### Процесс выполнения
+Проверим их **IP-адреса**:
+```
+root@keepalived-vm1:~# ip a
+192.168.1.127
+root@keepalived-vm2:~# ip a
+192.168.1.110
+```
+Установим сервис **Keepalived** на каждой виртуальной машине:
+```
+root@keepalived-vm1:~# apt install keepalived -y
+root@keepalived-vm2:~# apt install keepalived -y
+```
+Создадим конфиг-файл **/etc/keepalived/keepalived.conf** на **keepalived-vm1**:
+```
+root@keepalived-vm1:~# nano /etc/keepalived/keepalived.conf
+```
+```
+vrrp_instance VI_1 {
+        state MASTER
+        interface enp0s3
+        virtual_router_id 15
+        priority 255
+        advert_int 1
 
-Скачаем последнюю версию **Alertmanager 0.25.0** из GitHub:
-```
-wget https://github.com/prometheus/alertmanager/releases/alertmanager-0.25.0.linux-and64.tar.tz
-```
-Распакуем скачанный архив:
-```
-tar xvfz alertmanager-0.25.0.linux-and64.tar.tz
-```
-Скопируем содержимое получившейся директории в определенные расположения на нашем хосте и предоставим
-необходимые права доступа пользователю **prometheus**:
-```
-cd alertmanager-0.25.0.linux-and64.tar.tz
-cp ./alertmanager /usr/local/bin/alertmanager
-chown prometheus:prometheus /usr/local/bin/alertmanager
-cp ./amtool /usr/local/bin/amtool
-chown prometheus:prometheus /usr/local/bin/amtool
-cp ./alertmanager.yml /etc/prometheus/alertmanager.yml
-chown prometheus:prometheus /etc/prometheus/alertmanager.yml
-```
-Создадим сервис **prometheus-alertmanager.service**:
-```
-nano /etc/systemd/system/prometheus-alertmanager.service
-```
-```
-[Unit]
-Description=Alertmanager Service
-After=network.target
-[Service]
-EnvironmentFile=-/etc/default/alertmanager
-User=prometheus
-Group=prometheus
-Type=simple
-ExecStart=/usr/local/bin/alertmanager \
---config.file=/etc/prometheus/alertmanager.yml \
---storage.path=/var/lib/prometheus/alertmanager $ARGS
-ExecReload=/bin/kill -HUP $MAINPID
-Restart=on-failure
-[Install]
-WantedBy=multi-user.target
-```
-Запустим сервис **prometheus-alertmanager.service**:
-```
-systemctl enable prometheus-alertmanager.service
-systemctl start prometheus-alertmanager.service
-systemctl status prometheus-alertmanager.service
-```
-Проверка статуса работы сервиса **prometheus-alertmanager.service**:
+        virtual_ipaddress {
+              192.168.1.15/24
+        }
 
-<kbd>![Статус prometheus-alertmanager.service](img/prometheus-alertmanager.service_status.png)</kbd>
-
-Настройка **Prometheus** на работу c **Alertmanager**:
-```
-nano /etc/prometheus/prometheus.yml
-```
-Находим раздел **#Alertmanager configuration**, раскомментируем строку ```# - alertmanager:9093``` и
-заменим на ```- localhost: 9093```:
-
-```
-# Alertmanager configuration
-alerting:
-  alertmanagers:
-    - static_configs:
-        - targets:
-            - localhost:9093
-```
-<kbd>![Alert manager configuration в prometheus.yml](img/prometheus.yml_alertmanager_config.png)</kbd>
-
-Перезапустим **prometheus.service** и проверим статус работы сервиса:
-```
-systemctl restart prometheus.service
-systemctl status prometheus.service
-```
-<kbd>![Статус работы prometheus.service](img/prometheus_service_status.png)</kbd>
-
-Скриншот из веб-интерфейса **Prometheus**, показывающий состояние правила оповещения **InstanceDown**, 
-- **FIRING**:
-
-<kbd>![Prometheus Webinterface Rule Firing](img/prometheus_webinterface_alerts_instancedown_firing.png)</kbd>
-
-Скриншот из веб-интерфейса **Alertmanager**:
-
-<kbd>![Alertmanager Webinterface InstanceDown правило](img/alertmananer_webinterface_instancedown.png)</kbd>
-
----
-
-### Задание 3
-
-Активируйте экспортёр метрик в Docker и подключите его к Prometheus.
-
-#### Процесс выполнения
-
-1. Установка **docker engine** согласно инструкции приведенной на официальном сайте **Docker**:
-```
-sudo apt update
-sudo apt install ca-certificates curl gnupg
-
-sudo install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/debian/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-sudo chmod a+r /etc/apt/keyrings/docker.gpg
-
-echo \
-"deb [arch="$(dpkg --print-architecture)" signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/debian \
-"$(. /etc/os-release && echo "$VERSION_CODENAME")" stable" | \
-sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
-
-sudo apt update
-
-sudo apt install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-
-docker -v
-
-sudo docker run hello-world
-```
-<kbd>![Вывод на экран версии докера](img/docker_version.png)</kbd>
-
-<kbd>![Hello world container](img/docker_hello-world.png)</kbd>
-
-Включим автозапуск **docker.service**:
-```
-systemctl enable docker.service
-```
-Запустим **docker.service** и проверим его статус:
-```
-systemctl start docker.service
-systemctl status docker.service
-```
-2. Для того, чтобы активировать экспортер метрик в **Docker** (заранее заложенный туда функционал
-мониторига с помощью **Prometheus**), необходимо создать override-файл **daemon.json** для изменения
-стандартных параметров, с помощью которых запускается **Docker**:
-```
-nano /etc/docker/daemon.json
-```
-```
-{
- "metrics-addr": "0.0.0.0:9323",
- "experimental": true
 }
 ```
-3. Перезапустим **docker.service** и проверим его статус:
+Создадим конфиг-файл **/etc/keepalived/keepalived.conf** на **keepalived-vm2**:
 ```
-systemctl restart docker.service
-systemctl status docker.service
+root@keepalived-vm2:~# nano /etc/keepalived/keepalived.conf
 ```
-4. Подключаемся к эндпоинту **http://10.0.2.15:9323/metrics** и видим список различных метрик,
-которые выводим сам о себе **Docker**:
-
-<kbd>![Метрики Докера](img/docker_endpoint_metrics.png)</kbd>
-
-5. Добавим эндпоинт в конфиг **Prometheus**:
 ```
-nano /etc/prometheus/prometheus.yml
+vrrp_instance VI_1 {
+        state BACKUP
+        interface enp0s3
+        virtual_router_id 15
+        priority 200
+        advert_int 1
+
+        virtual_ipaddress {
+              192.168.1.15/24
+        }
+
+}
 ```
-В разделе **static_configs:** добавим новый **target** - **"10.0.2.15:9323"**:
-
-<kbd>![Добавление таргета в конфиг Prometheus](img/adding_target_prometheus_config.png)</kbd>
-
-Перезапустим **prometheus.service**:
+Включим автозагрузку сервиса **keepalived.service**:
 ```
-systemctl restart prometheus.service
+root@keepalived-vm1:~# systemctl enable keepalived.service
+root@keepalived-vm2:~# systemctl enable keepalived.service
 ```
-6. Проверим статус добавленного endpoint в веб-интерфейсе **Prometheus** - **http://10.0.2.15:9090/targets**:
+Запустим сервис **keepalived.service** на виртуальных машинах и проверим его статус:
+```
+root@keepalived-vm1:~# systemctl start keepalived.service
+root@keepalived-vm1:~# systemctl status keepalived.service
 
-<kbd>![Status -> Targets](img/prometheus_status_targets.png)</kbd>
+root@keepalived-vm2:~# systemctl start keepalived.service
+root@keepalived-vm2:~# systemctl status keepalived.service
 
+```
+<kbd>![Статус сервиса Keepalived на ВМ1](img/keepalived_status_vm1.png)</kbd>
+<kbd>![Статус сервиса Keepalived на ВМ2](img/keepalived_status_vm2.png)</kbd>
+```
+Проверяем сетевые настройки на **keepalived-vm1**:
+```
+ip a
+```
+Виртуальной машине был назначен дополнительный IP-адрес - **192.168.1.15** (floating IP, который
+назначил сервис **Keepalived**):
+```
+inet 192.168.1.15/24 scope global secondary enp0s3
+```
+Проверяем сетевые настройки на **keepalived-vm2**:
+```
+ip a
+inet 192.168.1.110/24
+```
+Здесь пока остался 1 IP-адрес - **192.168.1.110**.
 
+На виртуальной машине **keepalived-vm1** остановим сервис **keepalived.service**:
+```
+root@keepalived-vm1:~# systemctl stop keepalived.service
+```
+Теперь у виртуальной машины **keepalived_vm1** нет плавающего IP-адреса, а виртуальной машине
+**keepalived-vm2** был назначен floating IP - **192.168.1.15**, т.е. машина из режима BACKUP
+перешла в режим MASTER.
 
