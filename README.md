@@ -186,6 +186,7 @@ vrrp_instance VI_1 {
         }
 }
 ```
+```
 global_defs {
         script_user root
         enable_script_security
