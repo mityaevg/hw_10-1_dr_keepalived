@@ -19,8 +19,6 @@ Enter configuration commands, one per line.  End with CNTL/Z.
 Router0(config)#interface gigabitEthernet0/1
 Router0(config-if)#standby 1 track gigabitEthernet0/0
 ```
-<kbd>![Настройка отслеживания Gig0/0 для Grp 1](img/tracking_router1.png)</kbd>
-
 ```
 Router1>en
 Router1#conf t
@@ -28,7 +26,6 @@ Enter configuration commands, one per line.  End with CNTL/Z.
 Router1(config)#int gi0/1
 Router1(config-if)#standby 1 track gi0/0
 ```
-<kbd>![Настройка отслеживания Gig0/0 для Grp 0](img/tracking_router2.png)</kbd>
 
 Для проверки работы функции отслеживания состояния интерфейсов разорвем канал связи между
 **Switch0** и **Router1**:
