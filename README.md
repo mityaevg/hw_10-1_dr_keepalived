@@ -224,4 +224,4 @@ systemctl stop nginx.service
 
 При попытке открыть стартовую страницу **nginx** по floating IP, так же открывается ВМ2:
 
-<kbd>![Доступ к Nginx по плавающему IP через браузер](img/nginx_floating_ip_via_browser.png.png)</kbd>
+<kbd>![Доступ к Nginx по плавающему IP через браузер](img/nginx_floating_ip_via_browser.png)</kbd>
