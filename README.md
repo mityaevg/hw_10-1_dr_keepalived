@@ -148,8 +148,8 @@ nano /var/www/html/index.nginx-debian.html
 <h1>Welcome to 192.168.1.110!</h1>
 ```
 
-Bash-скрипт для проверки состояния сетевого порта **80**, на котором работает **Nginx-сервер**, и 
-доступности **index.html** в расположении **/var/www/html/index.nginx-debian.html**:
+Bash-скрипт **/usr/local/bin/port_index_exist.sh** для проверки состояния сетевого порта **80**, на котором 
+работает **Nginx-сервер**, и доступности **index.html** в расположении **/var/www/html/index.nginx-debian.html**:
 ```
 if [[ $(netstat -tulpn | grep LISTEN | grep :80) ]] && [[ -f /var/www/html/index.nginx-debian.html ]]; then
 exit 0
@@ -157,3 +157,73 @@ else
 exit 1
 fi
 ```
+
+Добавляем скрипт в **/etc/keepalived/keepalived.conf** на виртуальных машинах:
+```
+global_defs {
+        script_user root
+        enable_script_security
+}
+
+vrrp_script port_index_exist {
+       script "/usr/local/bin/port_index_exist.sh"
+       interval 3
+       fall 2   
+       rise 2
+}
+
+vrrp_instance VI_1 {
+        state MASTER
+        interface enp0s3
+        virtual_router_id 15
+        priority 254
+        advert_int 1
+        virtual_ipaddress {
+          192.168.1.15/24
+        }
+        track_script {
+          port_index_exist
+        }
+}
+```
+global_defs {
+        script_user root
+        enable_script_security
+}
+
+vrrp_script port_index_exist {
+       script "/usr/local/bin/port_index_exist.sh"
+       interval 3
+       fall 2   
+       rise 2
+}
+
+vrrp_instance VI_1 {
+        state BACKUP
+        interface enp0s3
+        virtual_router_id 15
+        priority 200
+        advert_int 1
+        virtual_ipaddress {
+          192.168.1.15/24
+        }
+        track_script {
+          port_index_exist
+        }
+}
+```
+Останавливаем работу **Nginx-сервера** на **keepalived_vm1**:
+```
+systemctl stop nginx.service
+```
+Проверяем статус **keepalived.service** на ВМ1:
+
+<kbd>![Статус сервиса Keepalived на ВМ1](img/keepalived_status_vm1_nginx_stopped.png)</kbd>
+
+Произошел переход в состояние BACKUP и плавающий IP-адрес **192.168.1.15** был присвоен ВМ2:
+
+<kbd>![Переход плавающего IP-адреса на ВМ2](img/floating_ip_address_migration_vm2.png)</kbd>
+
+При попытке открыть стартовую страницу **nginx** по floating IP, так же открывается ВМ2:
+
+<kbd>![Доступ к Nginx по плавающему IP через браузер](img/nginx_floating_ip_via_browser.png.png)</kbd>
